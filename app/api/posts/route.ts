@@ -84,11 +84,40 @@ export async function GET(req: Request) {
       };
     }
 
-    const posts = await prisma.post.findMany({
+    // Fetch user context if authenticated for hybrid resonance ranking
+    let userRankContext: any = null;
+    if (currentUserId && (tab === "foryou" || !tab)) {
+      const userMeta = await prisma.user.findUnique({
+        where: { id: currentUserId },
+        include: {
+          followedDomains: true,
+          skills: { include: { skill: true } },
+          sentConnections: { where: { status: "ACCEPTED" } },
+          receivedConnections: { where: { status: "ACCEPTED" } },
+        },
+      });
+
+      if (userMeta) {
+        const connectedUserIds = [
+          ...userMeta.sentConnections.map((c) => c.receiverId),
+          ...userMeta.receivedConnections.map((c) => c.senderId),
+        ];
+
+        userRankContext = {
+          userId: currentUserId,
+          primaryDomainId: userMeta.primaryDomainId,
+          followedDomainIds: userMeta.followedDomains.map((d) => d.domainId),
+          userSkills: userMeta.skills.map((s) => s.skill.name),
+          connectedUserIds,
+        };
+      }
+    }
+
+    let posts = await prisma.post.findMany({
       where: whereClause,
-      take: limit + 1,
+      take: limit + (tab === "foryou" ? 10 : 1),
       cursor: cursor ? { id: cursor } : undefined,
-      orderBy: { createdAt: "desc" },
+      orderBy: tab === "foryou" ? undefined : { createdAt: "desc" },
       include: {
         author: {
           select: {
@@ -149,6 +178,12 @@ export async function GET(req: Request) {
       },
     });
 
+    // Apply Hybrid Resonance Ranker if For You tab
+    if (tab === "foryou" && userRankContext) {
+      const { rankFeedPosts } = await import("@/lib/feed-algorithm");
+      posts = rankFeedPosts(posts, userRankContext);
+    }
+
     let nextCursor: string | null = null;
     if (posts.length > limit) {
       const nextItem = posts.pop();
@@ -156,7 +191,7 @@ export async function GET(req: Request) {
     }
 
     // Format post items for response
-    const formattedPosts = posts.map((post) => {
+    const formattedPosts = posts.slice(0, limit).map((post) => {
       const userReaction = post.reactions && post.reactions.length > 0 ? post.reactions[0].type : null;
       const isBookmarked = post.bookmarks && post.bookmarks.length > 0;
 

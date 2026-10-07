@@ -349,11 +349,42 @@ export function SettingsView() {
           </label>
         </div>
 
-        <div className="flex justify-end">
+        {/* Domain Digest Email Generator */}
+        <div className="pt-3 border-t border-border-hairline flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <span className="text-xs font-serif font-bold text-foreground block">
+              Weekly Domain Circle Digest
+            </span>
+            <span className="text-[11px] text-muted-text font-sans">
+              Receive a curated editorial newsletter with top architectures and design reviews in your domain.
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={async () => {
+              try {
+                const res = await fetch("/api/cron/email-digest");
+                if (res.ok) {
+                  toast.success("Dispatched Weekly Circle Digest to your inbox!");
+                } else {
+                  toast.error("Failed to generate digest");
+                }
+              } catch (e) {
+                toast.error("Digest generation error");
+              }
+            }}
+            className="px-4 py-2 rounded-2xl bg-raised hover:bg-surface border border-border-hairline text-xs font-mono font-bold text-primary transition-colors shadow-editorial-sm shrink-0"
+          >
+            Send Test Weekly Digest
+          </button>
+        </div>
+
+        <div className="flex justify-end pt-2">
           <button
             onClick={handleSavePreferences}
             disabled={savingPreferences}
-            className="px-5 py-2 rounded-xl bg-white/[0.08] hover:bg-white/[0.14] text-foreground text-xs font-bold border border-white/10 transition-all"
+            className="px-5 py-2 rounded-2xl bg-primary text-primary-foreground text-xs font-mono font-bold shadow-editorial-sm hover:brightness-110 transition-all"
           >
             {savingPreferences ? "Saving..." : "Save Notification Preferences"}
           </button>

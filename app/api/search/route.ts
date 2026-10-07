@@ -19,6 +19,30 @@ export async function GET(req: Request) {
     let domains: any[] = [];
     let jobs: any[] = [];
 
+    // Fetch current user context for relevance re-ranking
+    let currentUserMeta: any = null;
+    if (currentUserId) {
+      currentUserMeta = await prisma.user.findUnique({
+        where: { id: currentUserId },
+        include: {
+          skills: { include: { skill: true } },
+          sentConnections: { where: { status: "ACCEPTED" } },
+          receivedConnections: { where: { status: "ACCEPTED" } },
+        },
+      });
+    }
+
+    const connectedUserIds = currentUserMeta
+      ? [
+          ...currentUserMeta.sentConnections.map((c: any) => c.receiverId),
+          ...currentUserMeta.receivedConnections.map((c: any) => c.senderId),
+        ]
+      : [];
+
+    const userSkillNames = currentUserMeta
+      ? currentUserMeta.skills.map((s: any) => s.skill.name.toLowerCase())
+      : [];
+
     // Search Domains
     if (category === "all" || category === "domains") {
       domains = await prisma.domain.findMany({
@@ -48,6 +72,7 @@ export async function GET(req: Request) {
           { username: { contains: q } },
           { headline: { contains: q } },
           { bio: { contains: q } },
+          { skills: { some: { skill: { name: { contains: q } } } } },
         ];
       }
 
@@ -69,9 +94,9 @@ export async function GET(req: Request) {
         };
       }
 
-      users = await prisma.user.findMany({
+      const rawUsers = await prisma.user.findMany({
         where: userWhere,
-        take: 20,
+        take: 25,
         select: {
           id: true,
           name: true,
@@ -79,6 +104,7 @@ export async function GET(req: Request) {
           image: true,
           headline: true,
           location: true,
+          primaryDomainId: true,
           primaryDomain: true,
           skills: {
             include: { skill: true },
@@ -90,6 +116,32 @@ export async function GET(req: Request) {
           },
         },
       });
+
+      // Score and annotate users based on relevance
+      users = rawUsers
+        .map((u) => {
+          let score = 0;
+          const isSameDomain = currentUserMeta?.primaryDomainId && u.primaryDomainId === currentUserMeta.primaryDomainId;
+          const isConnected = connectedUserIds.includes(u.id);
+
+          const matchingSkills = u.skills
+            .map((s) => s.skill.name)
+            .filter((name) => userSkillNames.includes(name.toLowerCase()));
+
+          if (isSameDomain) score += 40;
+          if (isConnected) score += 30;
+          score += matchingSkills.length * 15;
+
+          return {
+            ...u,
+            relevanceScore: score,
+            isSameDomain,
+            isConnected,
+            matchingSkills,
+          };
+        })
+        .sort((a, b) => b.relevanceScore - a.relevanceScore)
+        .slice(0, 20);
     }
 
     // Search Posts
@@ -97,7 +149,10 @@ export async function GET(req: Request) {
       const postWhere: any = {};
 
       if (q) {
-        postWhere.content = { contains: q };
+        postWhere.OR = [
+          { content: { contains: q } },
+          { templateId: { contains: q } },
+        ];
       }
 
       if (domainId && domainId !== "all") {

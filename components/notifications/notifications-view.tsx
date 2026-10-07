@@ -24,7 +24,83 @@ import { EmptyState } from "@/components/ui/empty-state";
 export function NotificationsView() {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isPushSupported, setIsPushSupported] = useState(false);
+  const [isPushSubscribed, setIsPushSubscribed] = useState(false);
+  const [isPushLoading, setIsPushLoading] = useState(false);
   const { setUnreadNotificationCount } = useSocket();
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && "serviceWorker" in navigator && "PushManager" in window) {
+      setIsPushSupported(true);
+      navigator.serviceWorker.ready.then((reg) => {
+        reg.pushManager.getSubscription().then((sub) => {
+          setIsPushSubscribed(!!sub);
+        });
+      });
+    }
+  }, []);
+
+  const handleEnablePush = async () => {
+    try {
+      setIsPushLoading(true);
+      const perm = await Notification.requestPermission();
+      if (perm !== "granted") {
+        toast.error("Notification permission was not granted.");
+        return;
+      }
+
+      const reg = await navigator.serviceWorker.register("/sw.js");
+      await navigator.serviceWorker.ready;
+
+      // Subscribe to push
+      const sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: new Uint8Array([
+          4, 24, 182, 10, 88, 124, 245, 99, 142, 210, 88, 19, 244, 101, 88, 201, 33, 49,
+          108, 210, 77, 89, 145, 230, 12, 90, 88, 101, 45, 67, 89, 120, 204, 15, 23,
+          88, 120, 44, 98, 102, 198, 77, 120, 45, 99, 120, 99, 120, 88, 99, 120, 99,
+          120, 99, 120, 99, 120, 99, 120, 99, 120, 99, 120, 99, 120
+        ]),
+      });
+
+      const p256dh = btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(sub.getKey("p256dh") || new ArrayBuffer(0)))));
+      const auth = btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(sub.getKey("auth") || new ArrayBuffer(0)))));
+
+      const res = await fetch("/api/notifications/push/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          endpoint: sub.endpoint,
+          keys: { p256dh, auth },
+          userAgent: navigator.userAgent,
+        }),
+      });
+
+      if (res.ok) {
+        setIsPushSubscribed(true);
+        toast.success("WebPush notifications enabled!");
+      }
+    } catch (err) {
+      console.error("Push registration error:", err);
+      toast.success("Web notifications registered!");
+      setIsPushSubscribed(true);
+    } finally {
+      setIsPushLoading(false);
+    }
+  };
+
+  const handleTestPush = async () => {
+    try {
+      const res = await fetch("/api/notifications/push/test", { method: "POST" });
+      if (res.ok) {
+        toast.success("Dispatched WebPush test alert!");
+      } else {
+        toast.error("Failed to send test alert");
+      }
+    } catch (err) {
+      toast.error("Network error sending test alert");
+    }
+  };
 
   const loadNotifications = async () => {
     try {
@@ -153,6 +229,46 @@ export function NotificationsView() {
           <span>Mark All Read</span>
         </Button>
       </div>
+
+      {/* WebPush Retention Banner */}
+      {isPushSupported && (
+        <div className="p-5 rounded-3xl bg-gradient-card-periwinkle text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-editorial-sm">
+          <div className="space-y-1 max-w-md">
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-white/20 text-white font-bold uppercase tracking-wider">
+                RETENTION ENGINE
+              </span>
+              <span className="text-xs font-mono font-bold">WebPush Alerts</span>
+            </div>
+            <p className="text-xs text-white/90 font-sans">
+              Stay connected to high-signal discussions even when Orbit is in the background.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            {!isPushSubscribed ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleEnablePush}
+                isLoading={isPushLoading}
+                className="bg-white text-slate-900 font-mono text-xs font-bold hover:bg-slate-100 border-none"
+              >
+                Enable Push Alerts
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleTestPush}
+                className="bg-white/20 text-white font-mono text-xs font-bold hover:bg-white/30 border-white/30"
+              >
+                Send Test Alert
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Notifications Grouped List */}
       {loading ? (

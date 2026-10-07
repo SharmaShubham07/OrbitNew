@@ -50,9 +50,10 @@ model User {
   conversationsReceived  Conversation[] @relation("UserB")
   messages               Message[]
 
-  // Notifications
+  // Notifications & Push
   notificationsReceived Notification[] @relation("ReceivedNotifications")
   notificationsTriggered Notification[] @relation("TriggeredNotifications")
+  pushSubscriptions     PushSubscription[]
 
   // Jobs
   postedJobs      Job[]
@@ -399,5 +400,18 @@ model JobApplication {
 
   @@unique([jobId, userId])
   @@index([jobId])
+  @@index([userId])
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+  createdAt DateTime @default(now())
+
   @@index([userId])
 }
