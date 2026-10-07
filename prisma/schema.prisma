@@ -1,0 +1,400 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  username      String    @unique
+  passwordHash  String
+  image         String?
+  headline      String?
+  bio           String?
+  location      String?
+  website       String?
+  github        String?
+  twitter       String?
+  linkedin      String?
+  isOnboarded   Boolean   @default(false)
+  profileViews  Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Primary Domain
+  primaryDomainId String?
+  primaryDomain   Domain?   @relation("PrimaryDomainUsers", fields: [primaryDomainId], references: [id])
+
+  // Relations
+  profile         Profile?
+  followedDomains UserDomain[]
+  skills          ProfileSkill[]
+  experiences     Experience[]
+  educations      Education[]
+  posts           Post[]
+  comments        Comment[]
+  reactions       Reaction[]
+  bookmarks       Bookmark[]
+  
+  // Connections
+  sentConnections     Connection[] @relation("SentConnections")
+  receivedConnections Connection[] @relation("ReceivedConnections")
+
+  // Messaging
+  conversationsInitiated Conversation[] @relation("UserA")
+  conversationsReceived  Conversation[] @relation("UserB")
+  messages               Message[]
+
+  // Notifications
+  notificationsReceived Notification[] @relation("ReceivedNotifications")
+  notificationsTriggered Notification[] @relation("TriggeredNotifications")
+
+  // Jobs
+  postedJobs      Job[]
+  jobApplications JobApplication[]
+
+  // Polls
+  pollVotes PollVote[]
+
+  @@index([primaryDomainId])
+  @@index([username])
+  @@index([email])
+}
+
+model Profile {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  coverImage     String?
+  avatarImage    String?
+  about          String?
+  resumeUrl      String?
+  isOpenToWork   Boolean  @default(false)
+  isHiring       Boolean  @default(false)
+  isPrivate      Boolean  @default(false)
+  notifyOnLike   Boolean  @default(true)
+  notifyOnComment Boolean @default(true)
+  notifyOnConnect Boolean @default(true)
+  notifyOnMessage Boolean @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Domain {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  slug        String       @unique
+  description String
+  emoji       String
+  color       String       // Hex or Tailwind color token, e.g. #06b6d4
+  bgGradient  String       // e.g. from-cyan-500/20 to-blue-600/20
+  memberCount Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  primaryUsers User[]       @relation("PrimaryDomainUsers")
+  followers    UserDomain[]
+  posts        Post[]
+  jobs         Job[]
+
+  @@index([slug])
+}
+
+model UserDomain {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  domainId  String
+  domain    Domain   @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, domainId])
+  @@index([userId])
+  @@index([domainId])
+}
+
+model Skill {
+  id       String         @id @default(cuid())
+  name     String         @unique
+  category String?        // e.g. "Frontend", "AI/ML", "Design"
+  profiles ProfileSkill[]
+}
+
+model ProfileSkill {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skillId   String
+  skill     Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, skillId])
+  @@index([userId])
+  @@index([skillId])
+}
+
+model Experience {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  company     String
+  location    String?
+  startDate   DateTime
+  endDate     DateTime?
+  isCurrent   Boolean   @default(false)
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model Education {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  institution  String
+  degree       String
+  fieldOfStudy String
+  startDate    DateTime
+  endDate      DateTime?
+  grade        String?
+  activities   String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model Post {
+  id           String       @id @default(cuid())
+  authorId     String
+  author       User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  domainId     String
+  domain       Domain       @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  content      String
+  postType     String       @default("POST") // POST, POLL, ARTICLE
+  likeCount    Int          @default(0)
+  commentCount Int          @default(0)
+  shareCount   Int          @default(0)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  media        Media[]
+  comments     Comment[]
+  reactions    Reaction[]
+  bookmarks    Bookmark[]
+  poll         Poll?
+
+  @@index([authorId])
+  @@index([domainId])
+  @@index([createdAt])
+}
+
+model Media {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  url       String
+  type      String   // IMAGE, VIDEO, DOCUMENT
+  name      String?
+  size      Int?     // Size in bytes
+  createdAt DateTime @default(now())
+
+  @@index([postId])
+}
+
+model Poll {
+  id        String       @id @default(cuid())
+  postId    String       @unique
+  post      Post         @relation(fields: [postId], references: [id], onDelete: Cascade)
+  question  String
+  expiresAt DateTime
+  options   PollOption[]
+  createdAt DateTime     @default(now())
+}
+
+model PollOption {
+  id        String     @id @default(cuid())
+  pollId    String
+  poll      Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  text      String
+  voteCount Int        @default(0)
+  votes     PollVote[]
+
+  @@index([pollId])
+}
+
+model PollVote {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  optionId  String
+  option    PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  createdAt DateTime   @default(now())
+
+  @@unique([userId, optionId])
+  @@index([userId])
+  @@index([optionId])
+}
+
+model Comment {
+  id        String    @id @default(cuid())
+  postId    String
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parentId  String?
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentReplies")
+  content   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([postId])
+  @@index([authorId])
+  @@index([parentId])
+}
+
+model Reaction {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // LIKE (👍), INSIGHTFUL (💡), FIRE (🔥), CELEBRATE (👏)
+  createdAt DateTime @default(now())
+
+  @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
+}
+
+model Connection {
+  id          String   @id @default(cuid())
+  senderId    String
+  sender      User     @relation("SentConnections", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId  String
+  receiver    User     @relation("ReceivedConnections", fields: [receiverId], references: [id], onDelete: Cascade)
+  status      String   @default("PENDING") // PENDING, ACCEPTED, DECLINED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([senderId, receiverId])
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([status])
+}
+
+model Conversation {
+  id           String    @id @default(cuid())
+  userAId      String
+  userA        User      @relation("UserA", fields: [userAId], references: [id], onDelete: Cascade)
+  userBId      String
+  userB        User      @relation("UserB", fields: [userBId], references: [id], onDelete: Cascade)
+  lastMessageAt DateTime @default(now())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  messages     Message[]
+
+  @@unique([userAId, userBId])
+  @@index([userAId])
+  @@index([userBId])
+  @@index([lastMessageAt])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  content        String
+  fileUrl        String?
+  fileName       String?
+  fileType       String?
+  isRead         Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
+  @@index([senderId])
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String   // Recipient
+  user        User     @relation("ReceivedNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  actorId     String   // Person who performed action
+  actor       User     @relation("TriggeredNotifications", fields: [actorId], references: [id], onDelete: Cascade)
+  type        String   // LIKE, COMMENT, MENTION, CONNECT_REQUEST, CONNECT_ACCEPT, MESSAGE
+  title       String
+  message     String
+  link        String?
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([actorId])
+  @@index([isRead])
+}
+
+model Job {
+  id           String           @id @default(cuid())
+  posterId     String
+  poster       User             @relation(fields: [posterId], references: [id], onDelete: Cascade)
+  domainId     String
+  domain       Domain           @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  title        String
+  company      String
+  location     String
+  workplace    String           @default("REMOTE") // REMOTE, HYBRID, ON_SITE
+  jobType      String           @default("FULL_TIME") // FULL_TIME, PART_TIME, CONTRACT, INTERNSHIP
+  salaryRange  String?
+  description  String
+  requirements String?
+  isActive     Boolean          @default(true)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  applications JobApplication[]
+
+  @@index([posterId])
+  @@index([domainId])
+  @@index([isActive])
+}
+
+model JobApplication {
+  id        String   @id @default(cuid())
+  jobId     String
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  note      String?
+  resumeUrl String?
+  status    String   @default("SUBMITTED") // SUBMITTED, REVIEWING, ACCEPTED, REJECTED
+  createdAt DateTime @default(now())
+
+  @@unique([jobId, userId])
+  @@index([jobId])
+  @@index([userId])
+}
