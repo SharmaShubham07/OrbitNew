@@ -70,7 +70,7 @@ export function Tabs({
   return (
     <div
       className={cn(
-        "inline-flex items-center p-1 rounded-2xl bg-surface border border-border-hairline shadow-editorial-sm overflow-x-auto no-scrollbar",
+        "inline-flex items-center p-1 rounded-full bg-surface border border-border-hairline shadow-editorial-sm overflow-x-auto no-scrollbar",
         className
       )}
     >
@@ -81,10 +81,10 @@ export function Tabs({
             key={tab.id}
             onClick={() => onChange(tab.id)}
             className={cn(
-              "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono tracking-wider transition-all duration-200 shrink-0",
+              "flex items-center gap-2 px-4 py-2 rounded-full text-xs font-sans tracking-wide transition-all duration-200 shrink-0",
               isActive
-                ? "bg-raised text-foreground font-bold shadow-editorial-sm border border-border-hairline"
-                : "text-muted-text hover:text-foreground hover:bg-raised/40"
+                ? "bg-[#18181B] text-white font-semibold shadow-sm"
+                : "text-muted-text hover:text-foreground hover:bg-raised/60"
             )}
           >
             {tab.icon && <span>{tab.icon}</span>}
@@ -92,9 +92,9 @@ export function Tabs({
             {tab.count !== undefined && (
               <span
                 className={cn(
-                  "text-[10px] px-1.5 py-0.2 rounded-full font-mono",
+                  "text-[10px] px-2 py-0.5 rounded-full font-mono",
                   isActive
-                    ? "bg-primary text-primary-foreground"
+                    ? "bg-white/20 text-white"
                     : "bg-muted text-muted-text"
                 )}
               >

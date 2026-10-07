@@ -5,103 +5,103 @@
 @layer base {
   :root,
   .paper {
-    --background: #EDE6DA;
-    --foreground: #1E1B16;
-    --surface: #F7F2E9;
-    --raised: #FFFBF3;
-    --muted-text: #6B6355;
-    --border-hairline: #CFC5B3;
+    --background: #F4F0EB;
+    --foreground: #0F172A;
+    --surface: #FFFFFF;
+    --raised: #F8FAFC;
+    --muted-text: #64748B;
+    --border-hairline: #E5E0D8;
 
-    --card: #F7F2E9;
-    --card-foreground: #1E1B16;
-    --popover: #FFFBF3;
-    --popover-foreground: #1E1B16;
+    --card: #FFFFFF;
+    --card-foreground: #0F172A;
+    --popover: #FFFFFF;
+    --popover-foreground: #0F172A;
 
-    --primary: #B5552F;
-    --primary-foreground: #FFFBF3;
-    --secondary: #6F7B4A;
-    --secondary-foreground: #FFFBF3;
+    --primary: #587CF5;
+    --primary-foreground: #FFFFFF;
+    --secondary: #FF7054;
+    --secondary-foreground: #FFFFFF;
 
-    --muted: #E5DDCF;
-    --muted-foreground: #6B6355;
+    --muted: #F1EFEA;
+    --muted-foreground: #64748B;
 
-    --accent: #D9A441;
-    --accent-foreground: #1E1B16;
-    --accent-primary: #B5552F;
-    --accent-secondary: #6F7B4A;
-    --accent-tertiary: #D9A441;
+    --accent: #FFA474;
+    --accent-foreground: #0F172A;
+    --accent-primary: #587CF5;
+    --accent-secondary: #FF7054;
+    --accent-tertiary: #EC6FA8;
 
-    --border: #CFC5B3;
-    --input: #CFC5B3;
-    --ring: #B5552F;
-    --radius: 1rem;
+    --border: #E5E0D8;
+    --input: #E5E0D8;
+    --ring: #587CF5;
+    --radius: 1.25rem;
   }
 
   .cobalt {
-    --background: #F6EFD9;
-    --foreground: #0B1F66;
+    --background: #F4F0EB;
+    --foreground: #0F172A;
     --surface: #FFFFFF;
-    --raised: #EBF2FC;
-    --muted-text: #3A4B82;
-    --border-hairline: #D1E0F5;
+    --raised: #EFF6FF;
+    --muted-text: #475569;
+    --border-hairline: #DCE6F5;
 
     --card: #FFFFFF;
-    --card-foreground: #0B1F66;
+    --card-foreground: #0F172A;
     --popover: #FFFFFF;
-    --popover-foreground: #0B1F66;
+    --popover-foreground: #0F172A;
 
-    --primary: #1F4BD8;
-    --primary-foreground: #F6EFD9;
-    --secondary: #F2674A;
+    --primary: #4F46E5;
+    --primary-foreground: #FFFFFF;
+    --secondary: #FF7054;
     --secondary-foreground: #FFFFFF;
 
-    --muted: #E2ECFA;
-    --muted-foreground: #3A4B82;
+    --muted: #E0E7FF;
+    --muted-foreground: #475569;
 
-    --accent: #9CC4F2;
-    --accent-foreground: #0B1F66;
-    --accent-primary: #1F4BD8;
-    --accent-secondary: #F2674A;
-    --accent-tertiary: #9CC4F2;
+    --accent: #7C9EF8;
+    --accent-foreground: #0F172A;
+    --accent-primary: #4F46E5;
+    --accent-secondary: #FF7054;
+    --accent-tertiary: #7C9EF8;
 
-    --border: #D1E0F5;
-    --input: #D1E0F5;
-    --ring: #1F4BD8;
+    --border: #DCE6F5;
+    --input: #DCE6F5;
+    --ring: #4F46E5;
     --radius: 1.25rem;
   }
 
   .midnight,
   .dark {
-    --background: #0E0F14;
-    --foreground: #F1EBDD;
-    --surface: #171922;
-    --raised: #1F232F;
-    --muted-text: #9B988E;
-    --border-hairline: #2A2D3A;
+    --background: #0E1118;
+    --foreground: #F8FAFC;
+    --surface: #161B26;
+    --raised: #1E2433;
+    --muted-text: #94A3B8;
+    --border-hairline: #262E40;
 
-    --card: #171922;
-    --card-foreground: #F1EBDD;
-    --popover: #1F232F;
-    --popover-foreground: #F1EBDD;
+    --card: #161B26;
+    --card-foreground: #F8FAFC;
+    --popover: #1E2433;
+    --popover-foreground: #F8FAFC;
 
-    --primary: #E8A94A;
-    --primary-foreground: #0E0F14;
-    --secondary: #4FD1B5;
-    --secondary-foreground: #0E0F14;
+    --primary: #7C9EF8;
+    --primary-foreground: #0E1118;
+    --secondary: #FF7054;
+    --secondary-foreground: #0E1118;
 
-    --muted: #242836;
-    --muted-foreground: #9B988E;
+    --muted: #1E2433;
+    --muted-foreground: #94A3B8;
 
-    --accent: #4FD1B5;
-    --accent-foreground: #0E0F14;
-    --accent-primary: #E8A94A;
-    --accent-secondary: #4FD1B5;
-    --accent-tertiary: #A78BFA;
+    --accent: #FFA474;
+    --accent-foreground: #0E1118;
+    --accent-primary: #7C9EF8;
+    --accent-secondary: #FF7054;
+    --accent-tertiary: #EC6FA8;
 
-    --border: #2A2D3A;
-    --input: #2A2D3A;
-    --ring: #E8A94A;
-    --radius: 1rem;
+    --border: #262E40;
+    --input: #262E40;
+    --ring: #7C9EF8;
+    --radius: 1.25rem;
   }
 }
 
@@ -120,7 +120,7 @@
   }
 
   ::selection {
-    background-color: rgba(181, 85, 47, 0.25);
+    background-color: rgba(88, 124, 245, 0.25);
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -129,17 +129,71 @@
   }
 }
 
-/* Editorial Paper & Card Textures */
+/* Luminous Gradient Card Styles (from reference design) */
+.gradient-card-periwinkle {
+  background: linear-gradient(135deg, #7C9EF8 0%, #587CF5 100%);
+  color: #FFFFFF;
+}
+
+.gradient-card-sunset {
+  background: linear-gradient(180deg, #7D94F8 0%, #EC6FA8 50%, #FF8E62 100%);
+  color: #FFFFFF;
+}
+
+.gradient-card-peach {
+  background: linear-gradient(135deg, #FFA474 0%, #FF7054 100%);
+  color: #FFFFFF;
+}
+
+.gradient-card-lavender {
+  background: linear-gradient(135deg, #93A8F8 0%, #7C9EF8 100%);
+  color: #FFFFFF;
+}
+
+.frosted-pill {
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #FFFFFF;
+}
+
+/* Status Pill Tags (Matching Chainly reference) */
+.tag-completed {
+  background-color: #D1FAE5;
+  color: #065F46;
+  border: 1px solid #A7F3D0;
+}
+
+.tag-processing {
+  background-color: #EEF2FF;
+  color: #4338CA;
+  border: 1px solid #C7D2FE;
+}
+
+.tag-pending {
+  background-color: #FEF3C7;
+  color: #92400E;
+  border: 1px solid #FDE68A;
+}
+
+.tag-received {
+  background-color: #FEF3C7;
+  color: #B45309;
+  border: 1px solid #FDE68A;
+}
+
+/* Studio & Editorial Paper Cards */
 .editorial-card {
   background-color: var(--card);
   color: var(--card-foreground);
   border: 1px solid var(--border-hairline);
-  box-shadow: 0 2px 10px -2px rgba(30, 27, 22, 0.05);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .editorial-card:hover {
-  box-shadow: 0 8px 24px -4px rgba(30, 27, 22, 0.09);
+  box-shadow: 0 12px 32px -4px rgba(15, 23, 42, 0.08);
 }
 
 .editorial-raised {
@@ -164,20 +218,11 @@
 .bg-awning-stripes {
   background-image: repeating-linear-gradient(
     45deg,
-    rgba(31, 75, 216, 0.06),
-    rgba(31, 75, 216, 0.06) 12px,
+    rgba(88, 124, 245, 0.06),
+    rgba(88, 124, 245, 0.06) 12px,
     transparent 12px,
     transparent 24px
   );
-}
-
-.bg-paper-ruled {
-  background-image: linear-gradient(
-    to bottom,
-    transparent 96%,
-    rgba(207, 197, 179, 0.35) 96%
-  );
-  background-size: 100% 28px;
 }
 
 .bg-dot-matrix {
@@ -185,7 +230,7 @@
   background-size: 16px 16px;
 }
 
-/* Orbit Ring with Editorial Flair */
+/* Orbit Ring with Luminous Periwinkle & Sunset Glow */
 .orbit-ring-container {
   position: relative;
   display: inline-flex;
@@ -199,13 +244,13 @@
   border-radius: 9999px;
   background: conic-gradient(
     from 180deg at 50% 50%,
-    var(--accent-primary) 0deg,
-    var(--accent-secondary) 140deg,
-    var(--accent-tertiary) 260deg,
-    var(--accent-primary) 360deg
+    #587CF5 0deg,
+    #EC6FA8 120deg,
+    #FFA474 240deg,
+    #587CF5 360deg
   );
   animation: spin 20s linear infinite;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
 .orbit-ring-pulse {
@@ -214,8 +259,8 @@
   border-radius: 9999px;
   background: radial-gradient(
     circle,
-    rgba(181, 85, 47, 0.2) 0%,
-    rgba(111, 123, 74, 0.1) 60%,
+    rgba(88, 124, 245, 0.25) 0%,
+    rgba(255, 112, 84, 0.15) 60%,
     transparent 75%
   );
   animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;

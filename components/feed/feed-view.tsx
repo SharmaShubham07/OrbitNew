@@ -115,8 +115,8 @@ export function FeedView({ currentUser }: FeedViewProps) {
       )}
 
       {/* Editorial Feed Header & Filter Tabs */}
-      <div className="flex items-center justify-between p-1.5 rounded-2xl bg-surface border border-border-hairline sticky top-2 z-20 shadow-editorial-sm backdrop-blur-md">
-        <div className="flex items-center gap-1 w-full sm:w-auto overflow-x-auto no-scrollbar">
+      <div className="flex items-center justify-between p-1.5 rounded-full bg-surface border border-border-hairline sticky top-2 z-20 shadow-editorial-sm backdrop-blur-md">
+        <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto no-scrollbar">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -129,13 +129,13 @@ export function FeedView({ currentUser }: FeedViewProps) {
                   setNextCursor(null);
                 }}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono tracking-wider transition-all duration-200 flex-1 sm:flex-initial justify-center whitespace-nowrap",
+                  "flex items-center gap-2 px-4 py-2 rounded-full text-xs font-sans tracking-wide transition-all duration-200 flex-1 sm:flex-initial justify-center whitespace-nowrap",
                   isActive
-                    ? "bg-raised text-foreground font-bold shadow-editorial-sm border border-border-hairline"
+                    ? "bg-[#18181B] text-white font-semibold shadow-sm"
                     : "text-muted-text hover:text-foreground hover:bg-raised/50"
                 )}
               >
-                <Icon className={cn("w-3.5 h-3.5", isActive ? "text-primary" : "")} />
+                <Icon className={cn("w-3.5 h-3.5", isActive ? "text-white" : "")} />
                 <span>{tab.label}</span>
               </button>
             );
@@ -143,7 +143,7 @@ export function FeedView({ currentUser }: FeedViewProps) {
         </div>
 
         {tagParam && (
-          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-raised text-primary text-xs font-mono font-bold rounded-xl border border-border-hairline">
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-raised text-primary text-xs font-mono font-bold rounded-full border border-border-hairline">
             <span>#{tagParam}</span>
           </div>
         )}
