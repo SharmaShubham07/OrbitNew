@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Sparkles, TrendingUp, Users, ArrowUpRight, UserPlus, Check, Globe } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/components/ui/button";
 import { toast } from "sonner";
+import { Avatar } from "@/components/ui/avatar";
 
 interface RightBentoProps {
   user?: {
@@ -74,105 +75,115 @@ export function RightBento({ user }: RightBentoProps) {
   ];
 
   return (
-    <aside className="hidden lg:flex flex-col gap-6 w-80 xl:w-96 py-6 px-4 h-screen sticky top-0 overflow-y-auto border-l border-white/5">
-      {/* Domain Pulse Card */}
-      <div className="p-5 rounded-3xl glass-panel relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-cyan-500/20 transition-all duration-500" />
-        
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2 text-xs font-semibold text-cyan-400 uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Domain Pulse</span>
+    <aside className="hidden lg:flex flex-col gap-6 w-80 xl:w-96 py-6 px-4 h-screen sticky top-0 overflow-y-auto border-l border-border-hairline bg-surface/40">
+      {/* 01 // Domain Pulse Card */}
+      <div className="p-6 rounded-3xl bg-surface border border-border-hairline shadow-editorial-sm space-y-3 relative group">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs font-bold text-primary tracking-widest">
+              01
+            </span>
+            <span className="font-mono text-[10px] text-muted-text uppercase tracking-wider">
+              {"// DOMAIN PULSE"}
+            </span>
           </div>
-          <span className="text-[11px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 font-medium border border-cyan-500/20">
-            Live
+          <span className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">
+            LIVE CIRCLE
           </span>
         </div>
 
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-500/20 to-indigo-500/20 border border-cyan-500/30 flex items-center justify-center text-xl">
+        <div className="flex items-center gap-3 pt-1">
+          <div className="w-12 h-12 rounded-2xl bg-raised border border-border-hairline flex items-center justify-center text-2xl shadow-editorial-sm">
             {user?.domainEmoji || "🪐"}
           </div>
           <div>
-            <h3 className="font-heading font-bold text-sm text-foreground">
-              {user?.domainName || "Orbit Network"}
+            <h3 className="font-serif font-bold text-base text-foreground">
+              {user?.domainName || "Software Engineering"}
             </h3>
-            <p className="text-xs text-muted-foreground">Your primary craft circle</p>
+            <p className="text-xs text-muted-text font-sans">
+              Active domain community
+            </p>
           </div>
         </div>
 
-        <p className="text-xs text-muted-foreground/90 leading-relaxed mb-4">
-          Connect directly with engineers, designers, and architects discussing production best practices.
+        <p className="text-xs text-muted-text font-sans leading-relaxed">
+          High-signal discussions with architects, designers, and domain specialists.
         </p>
 
         <Link
-          href={user?.domainName ? `/domain/${user.domainName.toLowerCase().replace(/\s+/g, "-")}` : "/feed?tab=domain"}
-          className="flex items-center justify-between w-full py-2 px-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-xs font-medium text-foreground transition-colors group/link"
+          href={
+            user?.domainName
+              ? `/domain/${user.domainName.toLowerCase().replace(/\s+/g, "-")}`
+              : "/feed?tab=domain"
+          }
+          className="flex items-center justify-between w-full py-2 px-3 rounded-2xl bg-raised hover:bg-surface border border-border-hairline text-xs font-mono font-bold text-foreground transition-colors group/link"
         >
-          <span>Explore domain feed & directory</span>
-          <ArrowUpRight className="w-3.5 h-3.5 text-cyan-400 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
+          <span>Circle Feed & Members</span>
+          <ArrowUpRight className="w-3.5 h-3.5 text-primary group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
         </Link>
       </div>
 
-      {/* Suggested Connections (Bento Widget) */}
-      <div className="p-5 rounded-3xl glass-panel">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
-            <Users className="w-4 h-4 text-indigo-400" />
-            <span>Suggested Connections</span>
+      {/* 02 // Suggested Connections */}
+      <div className="p-6 rounded-3xl bg-surface border border-border-hairline shadow-editorial-sm space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs font-bold text-primary tracking-widest">
+              02
+            </span>
+            <span className="font-mono text-[10px] text-muted-text uppercase tracking-wider">
+              {"// SUGGESTED PEERS"}
+            </span>
           </div>
           <Link
             href="/network"
-            className="text-[11px] text-cyan-400 hover:text-cyan-300 font-medium transition-colors"
+            className="text-[11px] font-mono font-bold text-primary hover:underline"
           >
-            View all
+            ALL →
           </Link>
         </div>
 
         {loading ? (
-          <div className="flex flex-col gap-3">
+          <div className="space-y-3">
             {[1, 2, 3].map((i) => (
               <div key={i} className="flex items-center gap-3 animate-pulse">
-                <div className="w-9 h-9 rounded-full bg-white/5" />
-                <div className="flex-1">
-                  <div className="w-24 h-3 bg-white/5 rounded mb-1.5" />
-                  <div className="w-32 h-2.5 bg-white/5 rounded" />
+                <div className="w-9 h-9 rounded-full bg-muted" />
+                <div className="flex-1 space-y-1">
+                  <div className="w-24 h-3 bg-muted rounded" />
+                  <div className="w-32 h-2.5 bg-muted rounded" />
                 </div>
               </div>
             ))}
           </div>
         ) : suggestions.length > 0 ? (
-          <div className="flex flex-col gap-3.5">
-            {suggestions.map(({ user: candidate, sameDomain, sharedSkillsCount }) => {
+          <div className="space-y-3">
+            {suggestions.map(({ user: candidate, sameDomain }) => {
               const isSent = pendingRequests.has(candidate.id);
 
               return (
                 <div
                   key={candidate.id}
-                  className="flex items-center justify-between gap-3 p-2 rounded-2xl hover:bg-white/[0.03] transition-colors"
+                  className="flex items-center justify-between gap-3 p-2 rounded-2xl hover:bg-raised transition-colors"
                 >
                   <Link
                     href={`/in/${candidate.username}`}
                     className="flex items-center gap-2.5 min-w-0 flex-1 group"
                   >
-                    <div className="orbit-ring-container flex-shrink-0">
-                      <div className="orbit-ring opacity-60" />
-                      <img
-                        src={candidate.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${candidate.username}`}
-                        alt={candidate.name}
-                        className="w-9 h-9 rounded-full object-cover border border-background z-10"
-                      />
-                    </div>
+                    <Avatar
+                      src={candidate.image}
+                      alt={candidate.name}
+                      size="sm"
+                      withOrbit
+                    />
                     <div className="flex flex-col min-w-0">
-                      <span className="text-xs font-semibold truncate group-hover:text-cyan-400 transition-colors">
+                      <span className="text-xs font-serif font-bold text-foreground truncate group-hover:text-primary transition-colors">
                         {candidate.name}
                       </span>
-                      <span className="text-[11px] text-muted-foreground truncate">
+                      <span className="text-[11px] text-muted-text truncate font-sans">
                         {candidate.headline || `@${candidate.username}`}
                       </span>
                       {sameDomain && (
-                        <span className="text-[10px] text-cyan-400/90 font-medium mt-0.5">
-                          Same domain · {candidate.primaryDomain?.emoji}
+                        <span className="text-[10px] font-mono text-primary font-bold mt-0.5">
+                          Same domain circle
                         </span>
                       )}
                     </div>
@@ -182,47 +193,53 @@ export function RightBento({ user }: RightBentoProps) {
                     onClick={() => handleConnect(candidate.id, candidate.name)}
                     disabled={isSent}
                     className={cn(
-                      "p-1.5 rounded-xl text-xs font-medium flex items-center justify-center transition-all",
+                      "p-2 rounded-xl text-xs font-mono font-bold flex items-center justify-center transition-all shadow-editorial-sm",
                       isSent
-                        ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                        : "bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/20 active:scale-95"
+                        ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
+                        : "bg-raised hover:bg-surface text-foreground border border-border-hairline active:scale-95"
                     )}
                     title={isSent ? "Request Sent" : "Connect"}
                   >
-                    {isSent ? <Check className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+                    {isSent ? <Check className="w-3.5 h-3.5" /> : <UserPlus className="w-3.5 h-3.5 text-primary" />}
                   </button>
                 </div>
               );
             })}
           </div>
         ) : (
-          <p className="text-xs text-muted-foreground">You are connected with everyone in your area!</p>
+          <p className="text-xs text-muted-text font-sans">
+            You are connected with active members in your circle!
+          </p>
         )}
       </div>
 
-      {/* Trending Orbit Circles */}
-      <div className="p-5 rounded-3xl glass-panel">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
-            <TrendingUp className="w-4 h-4 text-rose-400" />
-            <span>Trending in Orbit</span>
+      {/* 03 // Trending Topics */}
+      <div className="p-6 rounded-3xl bg-surface border border-border-hairline shadow-editorial-sm space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs font-bold text-primary tracking-widest">
+              03
+            </span>
+            <span className="font-mono text-[10px] text-muted-text uppercase tracking-wider">
+              {"// TRENDING DISCUSSIONS"}
+            </span>
           </div>
         </div>
 
-        <div className="flex flex-col gap-2.5">
+        <div className="space-y-2">
           {trendingTags.map((t) => (
             <Link
               key={t.tag}
               href={`/feed?tag=${t.tag}`}
-              className="flex items-center justify-between p-2 rounded-xl hover:bg-white/[0.04] transition-colors group"
+              className="flex items-center justify-between p-2 rounded-2xl hover:bg-raised transition-colors group"
             >
               <div className="flex flex-col">
-                <span className="text-xs font-medium text-foreground group-hover:text-cyan-400 transition-colors">
+                <span className="text-xs font-mono font-bold text-foreground group-hover:text-primary transition-colors">
                   #{t.tag}
                 </span>
-                <span className="text-[10px] text-muted-foreground">{t.count}</span>
+                <span className="text-[10px] font-mono text-muted-text">{t.count}</span>
               </div>
-              <span className="text-[10px] px-2 py-0.5 rounded-lg bg-white/[0.04] text-muted-foreground border border-white/5">
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-lg bg-raised text-muted-text border border-border-hairline">
                 {t.domain}
               </span>
             </Link>
@@ -230,13 +247,12 @@ export function RightBento({ user }: RightBentoProps) {
         </div>
       </div>
 
-      {/* Footer Info */}
-      <div className="px-2 text-[11px] text-muted-foreground/60 flex flex-wrap gap-x-3 gap-y-1">
-        <span>Orbit © 2026</span>
-        <Link href="/about" className="hover:underline">About</Link>
-        <Link href="/privacy" className="hover:underline">Privacy</Link>
-        <Link href="/terms" className="hover:underline">Terms</Link>
-        <span>Domain-First Architecture</span>
+      {/* Magazine Footer Info */}
+      <div className="px-2 text-[10px] font-mono text-muted-text flex flex-wrap gap-x-3 gap-y-1">
+        <span>ORBIT JOURNAL © 2026</span>
+        <span>ISSUE 12</span>
+        <Link href="/privacy" className="hover:underline">PRIVACY</Link>
+        <Link href="/terms" className="hover:underline">TERMS</Link>
       </div>
     </aside>
   );

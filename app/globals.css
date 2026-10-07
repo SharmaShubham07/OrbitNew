@@ -3,49 +3,105 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --background: 225 35% 6%;
-    --foreground: 210 25% 98%;
-    --card: 224 30% 9%;
-    --card-foreground: 210 25% 98%;
-    --popover: 224 30% 8%;
-    --popover-foreground: 210 25% 98%;
-    --primary: 190 90% 48%;
-    --primary-foreground: 222 47% 4%;
-    --secondary: 255 60% 58%;
-    --secondary-foreground: 210 25% 98%;
-    --muted: 220 25% 13%;
-    --muted-foreground: 215 15% 62%;
-    --accent: 190 90% 48%;
-    --accent-foreground: 222 47% 4%;
-    --destructive: 0 65% 50%;
-    --destructive-foreground: 210 25% 98%;
-    --border: 220 20% 16%;
-    --input: 220 20% 16%;
-    --ring: 190 90% 48%;
-    --radius: 0.85rem;
+  :root,
+  .paper {
+    --background: #EDE6DA;
+    --foreground: #1E1B16;
+    --surface: #F7F2E9;
+    --raised: #FFFBF3;
+    --muted-text: #6B6355;
+    --border-hairline: #CFC5B3;
+
+    --card: #F7F2E9;
+    --card-foreground: #1E1B16;
+    --popover: #FFFBF3;
+    --popover-foreground: #1E1B16;
+
+    --primary: #B5552F;
+    --primary-foreground: #FFFBF3;
+    --secondary: #6F7B4A;
+    --secondary-foreground: #FFFBF3;
+
+    --muted: #E5DDCF;
+    --muted-foreground: #6B6355;
+
+    --accent: #D9A441;
+    --accent-foreground: #1E1B16;
+    --accent-primary: #B5552F;
+    --accent-secondary: #6F7B4A;
+    --accent-tertiary: #D9A441;
+
+    --border: #CFC5B3;
+    --input: #CFC5B3;
+    --ring: #B5552F;
+    --radius: 1rem;
   }
 
-  .light {
-    --background: 210 25% 98%;
-    --foreground: 222 40% 12%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 40% 12%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 40% 12%;
-    --primary: 190 90% 40%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 255 55% 55%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 210 20% 94%;
-    --muted-foreground: 215 15% 45%;
-    --accent: 190 90% 40%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 75% 55%;
-    --destructive-foreground: 210 25% 98%;
-    --border: 214 20% 88%;
-    --input: 214 20% 88%;
-    --ring: 190 90% 40%;
+  .cobalt {
+    --background: #F6EFD9;
+    --foreground: #0B1F66;
+    --surface: #FFFFFF;
+    --raised: #EBF2FC;
+    --muted-text: #3A4B82;
+    --border-hairline: #D1E0F5;
+
+    --card: #FFFFFF;
+    --card-foreground: #0B1F66;
+    --popover: #FFFFFF;
+    --popover-foreground: #0B1F66;
+
+    --primary: #1F4BD8;
+    --primary-foreground: #F6EFD9;
+    --secondary: #F2674A;
+    --secondary-foreground: #FFFFFF;
+
+    --muted: #E2ECFA;
+    --muted-foreground: #3A4B82;
+
+    --accent: #9CC4F2;
+    --accent-foreground: #0B1F66;
+    --accent-primary: #1F4BD8;
+    --accent-secondary: #F2674A;
+    --accent-tertiary: #9CC4F2;
+
+    --border: #D1E0F5;
+    --input: #D1E0F5;
+    --ring: #1F4BD8;
+    --radius: 1.25rem;
+  }
+
+  .midnight,
+  .dark {
+    --background: #0E0F14;
+    --foreground: #F1EBDD;
+    --surface: #171922;
+    --raised: #1F232F;
+    --muted-text: #9B988E;
+    --border-hairline: #2A2D3A;
+
+    --card: #171922;
+    --card-foreground: #F1EBDD;
+    --popover: #1F232F;
+    --popover-foreground: #F1EBDD;
+
+    --primary: #E8A94A;
+    --primary-foreground: #0E0F14;
+    --secondary: #4FD1B5;
+    --secondary-foreground: #0E0F14;
+
+    --muted: #242836;
+    --muted-foreground: #9B988E;
+
+    --accent: #4FD1B5;
+    --accent-foreground: #0E0F14;
+    --accent-primary: #E8A94A;
+    --accent-secondary: #4FD1B5;
+    --accent-tertiary: #A78BFA;
+
+    --border: #2A2D3A;
+    --input: #2A2D3A;
+    --ring: #E8A94A;
+    --radius: 1rem;
   }
 }
 
@@ -53,48 +109,83 @@
   * {
     @apply border-border;
   }
+  
+  html {
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
   body {
-    @apply bg-background text-foreground antialiased selection:bg-cyan-500/25 selection:text-cyan-200 tracking-[-0.01em];
+    @apply bg-background text-foreground antialiased tracking-[-0.01em];
     font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
   }
+
+  ::selection {
+    background-color: rgba(181, 85, 47, 0.25);
+  }
+
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-space-grotesk), "Space Grotesk", sans-serif;
-    letter-spacing: -0.025em;
+    font-family: var(--font-fraunces), Georgia, serif;
+    letter-spacing: -0.02em;
   }
 }
 
-/* Crisp, high-end Glassmorphism & Surface Cards */
-.glass-panel {
-  background: rgba(13, 19, 33, 0.72);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+/* Editorial Paper & Card Textures */
+.editorial-card {
+  background-color: var(--card);
+  color: var(--card-foreground);
+  border: 1px solid var(--border-hairline);
+  box-shadow: 0 2px 10px -2px rgba(30, 27, 22, 0.05);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.glass-panel-subtle {
-  background: rgba(13, 19, 33, 0.45);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+.editorial-card:hover {
+  box-shadow: 0 8px 24px -4px rgba(30, 27, 22, 0.09);
 }
 
-.glass-dropdown {
-  background: rgba(10, 15, 28, 0.92);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+.editorial-raised {
+  background-color: var(--raised);
+  border: 1px solid var(--border-hairline);
 }
 
-/* Subtle background grid pattern */
-.bg-grid-subtle {
-  background-size: 40px 40px;
-  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+.editorial-divider {
+  height: 1px;
+  background-color: var(--border-hairline);
+  width: 100%;
 }
 
-/* Glowing Orbit Avatar Ring (Refined & Elegant) */
+.editorial-stamp {
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* Striped Awning & Patterns */
+.bg-awning-stripes {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(31, 75, 216, 0.06),
+    rgba(31, 75, 216, 0.06) 12px,
+    transparent 12px,
+    transparent 24px
+  );
+}
+
+.bg-paper-ruled {
+  background-image: linear-gradient(
+    to bottom,
+    transparent 96%,
+    rgba(207, 197, 179, 0.35) 96%
+  );
+  background-size: 100% 28px;
+}
+
+.bg-dot-matrix {
+  background-image: radial-gradient(var(--border-hairline) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* Orbit Ring with Editorial Flair */
 .orbit-ring-container {
   position: relative;
   display: inline-flex;
@@ -104,25 +195,36 @@
 
 .orbit-ring {
   position: absolute;
-  inset: -2.5px;
+  inset: -3px;
   border-radius: 9999px;
-  background: conic-gradient(from 180deg at 50% 50%, #06b6d4 0deg, #8b5cf6 160deg, #f59e0b 280deg, #06b6d4 360deg);
-  animation: spin 16s linear infinite;
+  background: conic-gradient(
+    from 180deg at 50% 50%,
+    var(--accent-primary) 0deg,
+    var(--accent-secondary) 140deg,
+    var(--accent-tertiary) 260deg,
+    var(--accent-primary) 360deg
+  );
+  animation: spin 20s linear infinite;
   opacity: 0.85;
 }
 
 .orbit-ring-pulse {
   position: absolute;
-  inset: -5px;
+  inset: -6px;
   border-radius: 9999px;
-  background: radial-gradient(circle, rgba(6, 182, 212, 0.25) 0%, rgba(139, 92, 246, 0.12) 50%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(181, 85, 47, 0.2) 0%,
+    rgba(111, 123, 74, 0.1) 60%,
+    transparent 75%
+  );
   animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Custom Scrollbar */
+/* Scrollbars */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -130,10 +232,10 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.2);
+  background: var(--border-hairline);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.4);
+  background: var(--muted-text);
 }

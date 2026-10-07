@@ -4,8 +4,21 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { PostCard } from "@/components/feed/post-card";
 import { CreatePostModal } from "@/components/feed/create-post-modal";
-import { Sparkles, Globe, Users, Loader2, Plus, Filter } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { TemplateStudioModal } from "@/components/templates/template-studio-modal";
+import {
+  Sparkles,
+  Globe,
+  Users,
+  Loader2,
+  Plus,
+  ArrowUp,
+  Layout,
+  RefreshCw,
+} from "lucide-react";
+import { cn } from "@/components/ui/button";
+import { PostCardSkeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Button } from "@/components/ui/button";
 
 interface FeedViewProps {
   currentUser?: any;
@@ -22,6 +35,8 @@ export function FeedView({ currentUser }: FeedViewProps) {
   const [loadingMore, setLoadingMore] = useState(false);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isStudioOpen, setIsStudioOpen] = useState(false);
+  const [hasNewPostsNotification, setHasNewPostsNotification] = useState(false);
 
   useEffect(() => {
     if (initialTab) setActiveTab(initialTab);
@@ -59,7 +74,11 @@ export function FeedView({ currentUser }: FeedViewProps) {
   }, [activeTab, tagParam]);
 
   const handlePostCreated = (newPost: any) => {
-    setPosts((prev) => [newPost, ...prev]);
+    if (newPost && newPost.id) {
+      setPosts((prev) => [newPost, ...prev]);
+    } else {
+      fetchPosts(activeTab);
+    }
   };
 
   const handlePostDeleted = (postId: string) => {
@@ -70,17 +89,34 @@ export function FeedView({ currentUser }: FeedViewProps) {
     { id: "foryou", label: "For You", icon: Sparkles },
     {
       id: "domain",
-      label: currentUser?.primaryDomain?.name ? `My Domain (${currentUser.primaryDomain.emoji})` : "My Domain",
+      label: currentUser?.primaryDomain?.name
+        ? `${currentUser.primaryDomain.emoji} ${currentUser.primaryDomain.name}`
+        : "My Circle",
       icon: Globe,
     },
     { id: "connections", label: "Connections", icon: Users },
   ];
 
   return (
-    <div className="flex-1 max-w-2xl mx-auto py-6 px-4 flex flex-col gap-6 pb-28">
-      {/* Feed Tabs Bar */}
-      <div className="flex items-center justify-between p-1.5 rounded-2xl glass-panel sticky top-2 z-20 shadow-md">
-        <div className="flex items-center gap-1 w-full sm:w-auto">
+    <div className="flex-1 max-w-3xl mx-auto py-6 px-4 flex flex-col gap-6 pb-28">
+      {/* Floating 'New Posts Available' Pill */}
+      {hasNewPostsNotification && (
+        <button
+          onClick={() => {
+            fetchPosts(activeTab);
+            setHasNewPostsNotification(false);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+          className="fixed top-20 left-1/2 -translate-x-1/2 z-30 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-primary-foreground font-mono text-xs font-bold shadow-editorial-lift animate-bounce"
+        >
+          <ArrowUp className="w-3.5 h-3.5" />
+          <span>New Orbit Posts Available</span>
+        </button>
+      )}
+
+      {/* Editorial Feed Header & Filter Tabs */}
+      <div className="flex items-center justify-between p-1.5 rounded-2xl bg-surface border border-border-hairline sticky top-2 z-20 shadow-editorial-sm backdrop-blur-md">
+        <div className="flex items-center gap-1 w-full sm:w-auto overflow-x-auto no-scrollbar">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -93,13 +129,13 @@ export function FeedView({ currentUser }: FeedViewProps) {
                   setNextCursor(null);
                 }}
                 className={cn(
-                  "flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex-1 sm:flex-initial justify-center",
+                  "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono tracking-wider transition-all duration-200 flex-1 sm:flex-initial justify-center whitespace-nowrap",
                   isActive
-                    ? "bg-gradient-to-r from-cyan-500/20 to-indigo-500/20 text-cyan-300 border border-cyan-500/30 shadow-sm"
-                    : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                    ? "bg-raised text-foreground font-bold shadow-editorial-sm border border-border-hairline"
+                    : "text-muted-text hover:text-foreground hover:bg-raised/50"
                 )}
               >
-                <Icon className={cn("w-3.5 h-3.5", isActive ? "text-cyan-400" : "")} />
+                <Icon className={cn("w-3.5 h-3.5", isActive ? "text-primary" : "")} />
                 <span>{tab.label}</span>
               </button>
             );
@@ -107,71 +143,81 @@ export function FeedView({ currentUser }: FeedViewProps) {
         </div>
 
         {tagParam && (
-          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-cyan-500/10 text-cyan-300 text-xs font-medium rounded-xl border border-cyan-500/20">
-            <span>Filter: #{tagParam}</span>
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-raised text-primary text-xs font-mono font-bold rounded-xl border border-border-hairline">
+            <span>#{tagParam}</span>
           </div>
         )}
       </div>
 
-      {/* Top Post Prompt Pill (Quick Trigger) */}
-      <div
-        onClick={() => setIsCreateModalOpen(true)}
-        className="p-4 rounded-3xl glass-panel flex items-center gap-3 cursor-pointer hover:border-white/20 transition-all group shadow-sm hover:scale-[1.01]"
-      >
-        <div className="orbit-ring-container flex-shrink-0">
-          <div className="orbit-ring opacity-75" />
-          <img
-            src={
-              currentUser?.image ||
-              `https://api.dicebear.com/7.x/avataaars/svg?seed=${currentUser?.username || "user"}`
-            }
-            alt="Me"
-            className="w-10 h-10 rounded-full object-cover border-2 border-background z-10"
-          />
+      {/* Top Editorial Post Prompt Pill */}
+      <div className="p-4 rounded-3xl bg-surface border border-border-hairline shadow-editorial-sm space-y-3">
+        <div
+          onClick={() => setIsCreateModalOpen(true)}
+          className="flex items-center gap-3 cursor-pointer group"
+        >
+          <div className="orbit-ring-container shrink-0">
+            <div className="orbit-ring opacity-80" />
+            <img
+              src={
+                currentUser?.image ||
+                `https://api.dicebear.com/7.x/avataaars/svg?seed=${currentUser?.username || "user"}`
+              }
+              alt="Me"
+              className="w-10 h-10 rounded-full object-cover border-2 border-background z-10"
+            />
+          </div>
+          <div className="flex-1 bg-raised group-hover:bg-raised/70 border border-border-hairline rounded-2xl px-4 py-2.5 text-xs text-muted-text transition-colors flex items-center justify-between font-sans">
+            <span>Share an engineering insight, design review, or milestone...</span>
+            <Plus className="w-4 h-4 text-primary group-hover:rotate-90 transition-transform duration-300" />
+          </div>
         </div>
-        <div className="flex-1 bg-white/[0.04] group-hover:bg-white/[0.07] border border-white/5 rounded-2xl px-4 py-2.5 text-xs text-muted-foreground transition-colors flex items-center justify-between">
-          <span>Start a post, share craft insights, or run a poll...</span>
-          <Plus className="w-4 h-4 text-cyan-400 group-hover:rotate-90 transition-transform duration-300" />
+
+        {/* Quick Studio Shortcut Bar */}
+        <div className="pt-2 border-t border-border-hairline flex items-center justify-between">
+          <div className="flex items-center gap-2 text-[11px] font-mono text-muted-text">
+            <span>PRO TOOLS:</span>
+            <button
+              onClick={() => setIsStudioOpen(true)}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 font-bold transition-colors"
+            >
+              <Layout className="w-3.5 h-3.5" />
+              <span>16+ Post Templates</span>
+            </button>
+          </div>
+          <button
+            onClick={() => fetchPosts(activeTab)}
+            title="Refresh Feed"
+            className="p-1 text-muted-text hover:text-foreground"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
 
-      {/* Posts Stream */}
+      {/* Posts Stream (Bento Feed layout) */}
       {loading ? (
-        <div className="flex flex-col gap-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="p-6 rounded-3xl glass-panel animate-pulse flex flex-col gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-full bg-white/5" />
-                <div className="flex flex-col gap-2">
-                  <div className="w-32 h-3 bg-white/5 rounded" />
-                  <div className="w-48 h-2.5 bg-white/5 rounded" />
-                </div>
-              </div>
-              <div className="w-full h-16 bg-white/5 rounded-xl" />
-              <div className="w-full h-40 bg-white/5 rounded-2xl" />
-            </div>
-          ))}
+        <div className="space-y-4">
+          <PostCardSkeleton />
+          <PostCardSkeleton />
         </div>
       ) : posts.length === 0 ? (
-        <div className="p-12 rounded-3xl glass-panel text-center flex flex-col items-center justify-center gap-3">
-          <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-2xl">
-            🪐
-          </div>
-          <h3 className="font-heading font-bold text-base text-foreground">
-            No posts in this circle yet
-          </h3>
-          <p className="text-xs text-muted-foreground max-w-sm">
-            Be the first to share your engineering architectures, design systems, or industry breakthroughs.
-          </p>
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="mt-2 px-5 py-2.5 rounded-2xl bg-cyan-500 text-black text-xs font-bold shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 transition-all"
-          >
-            Create Post
-          </button>
-        </div>
+        <EmptyState
+          icon={<Sparkles className="w-7 h-7" />}
+          title="No posts in this circle yet"
+          description="Be the first to share your engineering architectures, design systems, or industry breakthroughs."
+          action={
+            <Button
+              variant="primary"
+              size="md"
+              onClick={() => setIsStudioOpen(true)}
+              className="font-mono text-xs font-bold"
+            >
+              Launch Template Studio
+            </Button>
+          }
+        />
       ) : (
-        <div className="flex flex-col gap-5">
+        <div className="space-y-6">
           {posts.map((post) => (
             <PostCard
               key={post.id}
@@ -185,42 +231,54 @@ export function FeedView({ currentUser }: FeedViewProps) {
           {/* Load More Trigger */}
           {nextCursor && (
             <div className="flex justify-center pt-4">
-              <button
+              <Button
+                variant="outline"
+                size="md"
                 onClick={() => fetchPosts(activeTab, nextCursor, true)}
-                disabled={loadingMore}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-white/[0.05] hover:bg-white/[0.1] text-xs font-semibold text-cyan-300 border border-white/10 transition-all"
+                isLoading={loadingMore}
+                className="font-mono text-xs font-bold"
               >
-                {loadingMore ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
-                    <span>Loading older posts...</span>
-                  </>
-                ) : (
-                  <span>Load more orbit posts</span>
-                )}
-              </button>
+                Load older posts
+              </Button>
             </div>
           )}
         </div>
       )}
 
       {/* Signature Floating Composer Pill at Bottom of Feed */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 hidden md:flex">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 hidden md:flex items-center gap-2 p-1.5 rounded-full bg-surface border-2 border-border-hairline shadow-editorial-lift backdrop-blur-md">
         <button
-          onClick={() => setIsCreateModalOpen(true)}
-          className="flex items-center gap-2.5 py-3 px-6 rounded-full bg-gradient-to-r from-cyan-500 via-indigo-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white text-xs font-bold shadow-2xl shadow-cyan-500/30 hover:shadow-cyan-500/50 hover:scale-105 active:scale-95 transition-all border border-white/20 backdrop-blur-md"
+          onClick={() => setIsStudioOpen(true)}
+          className="flex items-center gap-2 py-2.5 px-5 rounded-full bg-primary text-primary-foreground text-xs font-mono font-bold shadow-editorial-sm hover:brightness-110 active:scale-95 transition-all"
         >
           <Sparkles className="w-4 h-4" />
-          <span>New Orbit Post</span>
+          <span>Post Template Studio</span>
+        </button>
+        <button
+          onClick={() => setIsCreateModalOpen(true)}
+          className="flex items-center gap-1.5 py-2.5 px-4 rounded-full bg-raised hover:bg-raised/70 text-foreground text-xs font-mono font-bold border border-border-hairline transition-colors"
+        >
+          <Plus className="w-3.5 h-3.5 text-primary" />
+          <span>Quick Note</span>
         </button>
       </div>
 
-      {/* Modal */}
+      {/* Modals */}
       <CreatePostModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onPostCreated={handlePostCreated}
         currentUser={currentUser}
+      />
+
+      <TemplateStudioModal
+        isOpen={isStudioOpen}
+        onClose={() => setIsStudioOpen(false)}
+        domainId={currentUser?.primaryDomainId}
+        onPostPublished={() => {
+          setIsStudioOpen(false);
+          fetchPosts(activeTab);
+        }}
       />
     </div>
   );

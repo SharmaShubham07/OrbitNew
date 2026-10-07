@@ -179,7 +179,9 @@ model Post {
   domainId     String
   domain       Domain       @relation(fields: [domainId], references: [id], onDelete: Cascade)
   content      String
-  postType     String       @default("POST") // POST, POLL, ARTICLE
+  postType     String       @default("POST") // POST, POLL, ARTICLE, TEMPLATE
+  templateId   String?      // e.g., "pull-quote", "book-review", "milestone"
+  templateData String?      // JSON payload for template props
   likeCount    Int          @default(0)
   commentCount Int          @default(0)
   shareCount   Int          @default(0)
@@ -194,6 +196,7 @@ model Post {
 
   @@index([authorId])
   @@index([domainId])
+  @@index([templateId])
   @@index([createdAt])
 }
 
